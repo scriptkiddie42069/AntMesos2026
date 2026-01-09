@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="lt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ant mėsos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        .filters-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .filter-group input::placeholder {
+            color: #666;
+        }
+
+        .filter-group select {
+            cursor: pointer;
+        }
+
+        .filter-group select option {
+            background: #1a1a3e;
+            color: #fff;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #000;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #00d4ff;
+            font-size: 1.1rem;
+        }
+
+        .results-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .results-header {
+            padding: 20px 25px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .results-count {
+            color: #00d4ff;
+            font-weight: 700;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: rgba(20, 20, 50, 0.98);
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            color: #888;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s ease;
+        }
+
+        th:hover {
+            color: #00d4ff;
+        }
+
+        th.sorted-asc::after {
+            content: ' ▲';
+            color: #00d4ff;
+        }
+
+        th.sorted-desc::after {
+            content: ' ▼';
+            color: #00d4ff;
+        }
+
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .city-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .city-vilnius {
+            background: rgba(124, 58, 237, 0.3);
+            color: #a78bfa;
+        }
+
+        .city-kaunas {
+            background: rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .city-klaipeda {
+            background: rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+        }
+
+        .city-siauliai {
+            background: rgba(245, 158, 11, 0.3);
+            color: #fcd34d;
+        }
+
+        .city-panevezys {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .city-alytus {
+            background: rgba(236, 72, 153, 0.3);
+            color: #f9a8d4;
+        }
+
+        .info-cell {
+            max-width: 350px;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px;
+            color: #888;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .pagination span {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .stats-bar {
+                margin-left: 0;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Ant Mėsos 2026</h1>
+            <p class="subtitle">Šitie žmonės bus sušaudyti</p>
+        </header>
+
+        <div class="filters-panel">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Apskritis</label>
+                    <select id="filter-city">
+                        <option value="">Visos apskritys</option>
+                        <option value="vilnius">Vilnius</option>
+                        <option value="kaunas">Kaunas</option>
+                        <option value="klaipeda">Klaipėda</option>
+                        <option value="siauliai">Šiauliai</option>
+                        <option value="panevezys">Panevėžys</option>
+                        <option value="alytus">Alytus</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Pavardė</label>
+                    <input type="text" id="filter-lastname" placeholder="Pvz. JONAITIS">
+                </div>
+                <div class="filter-group">
+                    <label>Vardas</label>
+                    <input type="text" id="filter-name" placeholder="Pvz. A.">
+                </div>
+                <div class="filter-group">
+                    <label>Gimimo metai</label>
+                    <select id="filter-bdate">
+                        <option value="">Visi metai</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Miestas</label>
+                    <select id="filter-miestas">
+                        <option value="">Visi miestai</option>
+                        <option value="Vilnius">Vilnius</option>
+                        <option value="Kaunas">Kaunas</option>
+                        <option value="Klaipėda">Klaipėda</option>
+                        <option value="Šiauliai">Šiauliai</option>
+                        <option value="Panevėžys">Panevėžys</option>
+                        <option value="Alytus">Alytus</option>
+                        <option value="Marijampolė">Marijampolė</option>
+                        <option value="Ukmergė">Ukmergė</option>
+                        <option value="Utena">Utena</option>
+                        <option value="Tauragė">Tauragė</option>
+                        <option value="Telšiai">Telšiai</option>
+                        <option value="Trakai">Trakai</option>
+                        <option value="Ignalina">Ignalina</option>
+                        <option value="Jonava">Jonava</option>
+                        <option value="Kėdainiai">Kėdainiai</option>
+                        <option value="Mažeikiai">Mažeikiai</option>
+                        <option value="Molėtai">Molėtai</option>
+                        <option value="Plungė">Plungė</option>
+                        <option value="Raseiniai">Raseiniai</option>
+                        <option value="Rokiškis">Rokiškis</option>
+                        <option value="Šilutė">Šilutė</option>
+                        <option value="Šalčininkai">Šalčininkai</option>
+                        <option value="Varėna">Varėna</option>
+                        <option value="Biržai">Biržai</option>
+                        <option value="Jurbarkas">Jurbarkas</option>
+                        <option value="Pakruojis">Pakruojis</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Info / Paieška</label>
+                    <input type="text" id="filter-info" placeholder="Tekstas info laukelyje...">
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-primary" onclick="applyFilters()">
+                    🔍 Filtruoti
+                </button>
+                <button class="btn btn-secondary" onclick="clearFilters()">
+                    ✕ Valyti filtrus
+                </button>
+                <button class="btn btn-export" onclick="exportCSV()">
+                    📥 Eksportuoti CSV
+                </button>
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span>Iš viso:</span>
+                        <span class="stat-value" id="total-count">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Rasta:</span>
+                        <span class="stat-value" id="filtered-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-panel">
+            <div class="results-header">
+                <span class="results-title">Rezultatai</span>
+                <span>Rodo <span class="results-count" id="showing-count">0</span> įrašų</span>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Kraunami duomenys...</p>
+            </div>
+
+            <div class="table-container" id="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-sort="city">Apskritis</th>
+                            <th data-sort="miestas">Miestas</th>
+                            <th data-sort="name">Vardas</th>
+                            <th data-sort="lastname">Pavardė</th>
+                            <th data-sort="bdate">Metai</th>
+                            <th data-sort="number">Numeris</th>
+                            <th data-sort="info">Info</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <div class="empty-state-icon">🔍</div>
+                <p>Pagal pasirinktus filtrus rezultatų nerasta</p>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <button id="prev-page" onclick="changePage(-1)">← Ankstesnis</button>
+                <span id="page-info">1 / 1</span>
+                <button id="next-page" onclick="changePage(1)">Kitas →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const pageSize = 100;
+        let sortColumn = null;
+        let sortDirection = 'asc';
+
+        // Department code to city name mapping (extracted from info field)
+        const deptToMiestas = {
+            '213': 'Vilnius',
+            '214': 'Alytus',
+            '216': 'Marijampolė',
+            '217': 'Kaunas',
+            '218': 'Panevėžys',
+            '219': 'Šiauliai',
+            '223': 'Biržai',
+            '224': 'Varėna',
+            '227': 'Ignalina',
+            '228': 'Jonava',
+            '231': 'Kėdainiai',
+            '237': 'Mažeikiai',
+            '238': 'Molėtai',
+            '239': 'Pakruojis',
+            '241': 'Plungė',
+            '244': 'Raseiniai',
+            '245': 'Rokiškis',
+            '247': 'Tauragė',
+            '248': 'Klaipėda',
+            '249': 'Trakai',
+            '250': 'Ukmergė',
+            '251': 'Utena',
+            '253': 'Šalčininkai',
+            '256': 'Šilutė',
+            '258': 'Jurbarkas',
+            '260': 'Klaipėda'
+        };
+
+        // URL parameter mapping (Lithuanian -> field names)
+        const paramMap = {
+            'apskritis': 'filter-city',
+            'pavarde': 'filter-lastname',
+            'vardas': 'filter-name',
+            'metai': 'filter-bdate',
+            'miestas': 'filter-miestas',
+            'info': 'filter-info'
+        };
+
+        // Read URL parameters and populate filters
+        function loadFiltersFromURL() {
+            const params = new URLSearchParams(window.location.search);
+
+            for (const [param, elementId] of Object.entries(paramMap)) {
+                const value = params.get(param);
+                if (value) {
+                    document.getElementById(elementId).value = value;
+                }
+            }
+
+            // Also support page parameter
+            const page = params.get('puslapis') || params.get('page');
+            if (page) {
+                currentPage = parseInt(page) || 1;
+            }
+        }
+
+        // Update URL to reflect current filters
+        function updateURL() {
+            const params = new URLSearchParams();
+
+            for (const [param, elementId] of Object.entries(paramMap)) {
+                const value = document.getElementById(elementId).value;
+                if (value) {
+                    params.set(param, value);
+                }
+            }
+
+            if (currentPage > 1) {
+                params.set('puslapis', currentPage);
+            }
+
+            const newURL = params.toString()
+                ? `${window.location.pathname}?${params.toString()}`
+                : window.location.pathname;
+
+            window.history.replaceState({}, '', newURL);
+        }
+
+        // Load all JSON files
+        async function loadData() {
+            document.getElementById('loading').classList.add('active');
+
+            const cities = ['vilnius', 'kaunas', 'klaipeda', 'siauliai', 'panevezys', 'alytus'];
+
+            try {
+                const promises = cities.map(async city => {
+                    const response = await fetch(`${city}.json`);
+                    const data = await response.json();
+                    // Add city (apskritis) and miestas (from department) to each record
+                    return data.map(record => ({
+                        ...record,
+                        city,
+                        miestas: deptToMiestas[record.department] || 'Nežinomas'
+                    }));
+                });
+
+                const results = await Promise.all(promises);
+                allData = results.flat();
+                filteredData = [...allData];
+
+                document.getElementById('total-count').textContent = allData.length.toLocaleString();
+                document.getElementById('filtered-count').textContent = allData.length.toLocaleString();
+
+                // Populate birth year dropdown from actual data
+                const years = [...new Set(allData.map(r => r.bdate))].sort();
+                const bdateSelect = document.getElementById('filter-bdate');
+                years.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    bdateSelect.appendChild(option);
+                });
+
+                // Check for URL parameters and apply filters
+                loadFiltersFromURL();
+                const hasFilters = Object.values(paramMap).some(id => document.getElementById(id).value);
+                if (hasFilters) {
+                    applyFilters();
+                } else {
+                    renderTable();
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('results-body').innerHTML =
+                    '<tr><td colspan="7" style="text-align: center; color: #f00;">Klaida kraunant duomenis. Patikrinkite ar JSON failai yra tame pačiame aplanke.</td></tr>';
+            } finally {
+                document.getElementById('loading').classList.remove('active');
+            }
+        }
+
+        function applyFilters() {
+            const city = document.getElementById('filter-city').value.toLowerCase();
+            const lastname = document.getElementById('filter-lastname').value.toLowerCase();
+            const name = document.getElementById('filter-name').value.toLowerCase();
+            const bdate = document.getElementById('filter-bdate').value;
+            const miestas = document.getElementById('filter-miestas').value;
+            const info = document.getElementById('filter-info').value.toLowerCase();
+
+            filteredData = allData.filter(record => {
+                if (city && record.city.toLowerCase() !== city) return false;
+                if (lastname && !record.lastname.toLowerCase().includes(lastname)) return false;
+                if (name && !record.name.toLowerCase().includes(name)) return false;
+                if (bdate && record.bdate !== bdate) return false;
+                if (miestas && record.miestas !== miestas) return false;
+                if (info && !record.info.toLowerCase().includes(info)) return false;
+                return true;
+            });
+
+            document.getElementById('filtered-count').textContent = filteredData.length.toLocaleString();
+            currentPage = 1;
+            renderTable();
+            updateURL();
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-city').value = '';
+            document.getElementById('filter-lastname').value = '';
+            document.getElementById('filter-name').value = '';
+            document.getElementById('filter-bdate').value = '';
+            document.getElementById('filter-miestas').value = '';
+            document.getElementById('filter-info').value = '';
+
+            filteredData = [...allData];
+            document.getElementById('filtered-count').textContent = allData.length.toLocaleString();
+            currentPage = 1;
+            sortColumn = null;
+            sortDirection = 'asc';
+
+            // Clear sort indicators
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sorted-asc', 'sorted-desc');
+            });
+
+            renderTable();
+            updateURL();
+        }
+
+        function sortData(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            filteredData.sort((a, b) => {
+                let valA = a[column] || '';
+                let valB = b[column] || '';
+
+                if (column === 'bdate') {
+                    valA = parseInt(valA) || 0;
+                    valB = parseInt(valB) || 0;
+                } else {
+                    valA = valA.toString().toLowerCase();
+                    valB = valB.toString().toLowerCase();
+                }
+
+                if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+                if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Update sort indicators
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sorted-asc', 'sorted-desc');
+                if (th.dataset.sort === column) {
+                    th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+                }
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('results-body');
+            const emptyState = document.getElementById('empty-state');
+            const tableContainer = document.getElementById('table-container');
+
+            if (filteredData.length === 0) {
+                emptyState.style.display = 'block';
+                tableContainer.style.display = 'none';
+                document.getElementById('pagination').style.display = 'none';
+                document.getElementById('showing-count').textContent = '0';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            tableContainer.style.display = 'block';
+            document.getElementById('pagination').style.display = 'flex';
+
+            const start = (currentPage - 1) * pageSize;
+            const end = Math.min(start + pageSize, filteredData.length);
+            const pageData = filteredData.slice(start, end);
+
+            document.getElementById('showing-count').textContent = `${start + 1}-${end}`;
+
+            tbody.innerHTML = pageData.map(record => `
+                <tr>
+                    <td><span class="city-badge city-${record.city}">${record.city}</span></td>
+                    <td>${record.miestas}</td>
+                    <td>${record.name}</td>
+                    <td><strong>${record.lastname}</strong></td>
+                    <td>${record.bdate}</td>
+                    <td style="font-family: monospace; color: #888;">${record.number}</td>
+                    <td class="info-cell">${record.info}</td>
+                </tr>
+            `).join('');
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            document.getElementById('page-info').textContent = `${currentPage} / ${totalPages}`;
+            document.getElementById('prev-page').disabled = currentPage <= 1;
+            document.getElementById('next-page').disabled = currentPage >= totalPages;
+        }
+
+        function changePage(delta) {
+            const totalPages = Math.ceil(filteredData.length / pageSize);
+            const newPage = currentPage + delta;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderTable();
+                updateURL();
+                document.querySelector('.table-container').scrollTop = 0;
+            }
+        }
+
+        function exportCSV() {
+            if (filteredData.length === 0) {
+                alert('Nėra duomenų eksportui');
+                return;
+            }
+
+            const headers = ['Miestas', 'Vardas', 'Pavardė', 'Gimimo metai', 'Skyrius', 'Numeris', 'Info'];
+            const rows = filteredData.map(r => [
+                r.city,
+                r.name,
+                r.lastname,
+                r.bdate,
+                r.department,
+                r.number,
+                `"${r.info.replace(/"/g, '""')}"`
+            ]);
+
+            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `nusaut_export_${new Date().toISOString().slice(0, 10)}.csv`;
+            link.click();
+        }
+
+        // Setup sort handlers
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => sortData(th.dataset.sort));
+        });
+
+        // Filter on Enter key
+        document.querySelectorAll('.filter-group input').forEach(input => {
+            input.addEventListener('keypress', e => {
+                if (e.key === 'Enter') applyFilters();
+            });
+        });
+
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+
+</html>
