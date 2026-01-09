@@ -701,7 +701,7 @@
                 if (city && record.city.toLowerCase() !== city) return false;
                 if (!matchesOr(record.lastname, lastname)) return false;
                 if (!matchesOr(record.name, name)) return false;
-                if (bdate && record.bdate !== bdate) return false;
+                if (!matchesOr(record.bdate, bdate, true)) return false;
                 if (miestas && record.miestas !== miestas) return false;
                 if (!matchesOr(record.info, info)) return false;
                 return true;
