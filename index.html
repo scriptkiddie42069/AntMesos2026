@@ -687,13 +687,23 @@
             const miestas = document.getElementById('filter-miestas').value;
             const info = document.getElementById('filter-info').value.toLowerCase();
 
+            // Helper for OR matching (comma-separated values)
+            const matchesOr = (value, filter, exact = false) => {
+                if (!filter) return true;
+                const options = filter.split(',').map(s => s.trim().toLowerCase());
+                const val = value.toLowerCase();
+                return exact
+                    ? options.some(opt => val === opt)
+                    : options.some(opt => val.includes(opt));
+            };
+
             filteredData = allData.filter(record => {
                 if (city && record.city.toLowerCase() !== city) return false;
-                if (lastname && !record.lastname.toLowerCase().includes(lastname)) return false;
-                if (name && !record.name.toLowerCase().includes(name)) return false;
+                if (!matchesOr(record.lastname, lastname)) return false;
+                if (!matchesOr(record.name, name)) return false;
                 if (bdate && record.bdate !== bdate) return false;
                 if (miestas && record.miestas !== miestas) return false;
-                if (info && !record.info.toLowerCase().includes(info)) return false;
+                if (!matchesOr(record.info, info)) return false;
                 return true;
             });
 
