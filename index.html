@@ -433,9 +433,7 @@
                 </div>
                 <div class="filter-group">
                     <label>Gimimo metai</label>
-                    <select id="filter-bdate">
-                        <option value="">Visi metai</option>
-                    </select>
+                    <input type="text" id="filter-bdate" placeholder="Pvz. 2007 arba 2003,2004">
                 </div>
                 <div class="filter-group">
                     <label>Miestas</label>
@@ -651,16 +649,6 @@
 
                 document.getElementById('total-count').textContent = allData.length.toLocaleString();
                 document.getElementById('filtered-count').textContent = allData.length.toLocaleString();
-
-                // Populate birth year dropdown from actual data
-                const years = [...new Set(allData.map(r => r.bdate))].sort();
-                const bdateSelect = document.getElementById('filter-bdate');
-                years.forEach(year => {
-                    const option = document.createElement('option');
-                    option.value = year;
-                    option.textContent = year;
-                    bdateSelect.appendChild(option);
-                });
 
                 // Check for URL parameters and apply filters
                 loadFiltersFromURL();
